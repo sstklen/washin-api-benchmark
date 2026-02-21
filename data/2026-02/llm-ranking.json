@@ -1,0 +1,110 @@
+{
+  "month": "2026-02",
+  "testDate": "2026-02-20",
+  "testLocation": "Tokyo, Japan (AWS ap-northeast-1)",
+  "roundsPerAPI": 4,
+  "reasoningQuestion": "A shelter has 28 animals. 3/7 are cats. Cats eat 2kg/month, others eat 1.5kg/month. Total monthly feed consumption?",
+  "reasoningAnswer": 48,
+  "rankings": [
+    {
+      "rank": 1,
+      "model": "Gemini 2.5 Flash",
+      "provider": "Google",
+      "score": 93,
+      "speedMs": 990,
+      "reasoning": 100,
+      "code": 100,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 1,
+      "model": "xAI Grok 4.1 Fast",
+      "provider": "xAI",
+      "score": 93,
+      "speedMs": 1621,
+      "reasoning": 100,
+      "code": 100,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 3,
+      "model": "Cerebras llama3.1-8b",
+      "provider": "Cerebras",
+      "score": 92,
+      "speedMs": 316,
+      "reasoning": 100,
+      "code": 100,
+      "multilingual": { "cn": 30, "jp": 60, "en": 60 }
+    },
+    {
+      "rank": 4,
+      "model": "Gemini 2.0 Flash",
+      "provider": "Google",
+      "score": 88,
+      "speedMs": 668,
+      "reasoning": 30,
+      "code": 100,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 5,
+      "model": "DeepSeek Chat",
+      "provider": "DeepSeek",
+      "score": 87,
+      "speedMs": 1046,
+      "reasoning": 100,
+      "code": 60,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 5,
+      "model": "Mistral Small",
+      "provider": "Mistral",
+      "score": 87,
+      "speedMs": 557,
+      "reasoning": 100,
+      "code": 60,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 7,
+      "model": "DeepSeek Reasoner (R1)",
+      "provider": "DeepSeek",
+      "score": 83,
+      "speedMs": 2696,
+      "reasoning": 100,
+      "code": 0,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 7,
+      "model": "Groq llama-3.3-70b",
+      "provider": "Groq",
+      "score": 83,
+      "speedMs": 306,
+      "reasoning": 100,
+      "code": 60,
+      "multilingual": { "cn": 30, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 9,
+      "model": "OpenAI GPT-4o-mini",
+      "provider": "OpenAI",
+      "score": 82,
+      "speedMs": 1631,
+      "reasoning": 30,
+      "code": 60,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    },
+    {
+      "rank": 10,
+      "model": "Cerebras GPT-OSS-120B",
+      "provider": "Cerebras",
+      "score": 80,
+      "speedMs": 382,
+      "reasoning": 100,
+      "code": 20,
+      "multilingual": { "cn": 100, "jp": 100, "en": 100 }
+    }
+  ]
+}
