@@ -1,3 +1,5 @@
+**🌐 Language:** English | [繁體中文](README.zh.md) | [日本語](README.ja.md)
+
 # AI Agent API Benchmark — Monthly Report
 
 > **We test 30+ AI APIs every month so you don't have to.**
