@@ -8,7 +8,11 @@ We're building API infrastructure for AI agents. An AI agent doesn't just call o
 
 The question we faced: **for each of these tasks, which provider should we route to?**
 
-The lazy answer is to pick the most popular name for each category. But popularity doesn't guarantee quality — especially when your agents work in Chinese, Japanese, and English. So we decided to test everything first, then design our routing from the data.
+The lazy answer is to pick the most popular name — or the most premium tier — for each category. But our goal was never to find the most expensive provider. It was to find **the best fit**: the provider that actually scores highest on the tasks our agents need, in the languages our users speak.
+
+Popularity doesn't guarantee quality. Neither does a premium label. An 8-billion-parameter model beat GPT-4o-mini by 10 points in our exams. LLM-based translation matched DeepL's quality score. The providers that ranked #1 in our tests were often not the ones you'd expect.
+
+So we decided to test everything first, then design our routing purely from the data — not from brand names, not from pricing tiers, not from assumptions.
 
 ## How We Tested: 4 Rounds, 31 Providers
 
@@ -196,6 +200,8 @@ Not a fallback chain — a pipeline. Web Reader uses the 4-level fallback (#4). 
 | Geocoding | Nominatim → OpenCage → Mapbox | Coverage → Format → Accuracy |
 | News | NewsAPI → Web Search | Dedicated → General |
 | Extract | Reader → LLM | Pipeline, not fallback |
+
+Notice something about this table: **the #1 pick in each category is rarely the most well-known or most premium provider.** Gemini over GPT. Tavily over Google. Cohere over OpenAI embeddings. Nominatim over Mapbox. Every first-choice decision was made by exam score, not by reputation. The result is a routing table optimized for what actually works best — not for what looks most impressive on a pitch deck.
 
 ---
 
