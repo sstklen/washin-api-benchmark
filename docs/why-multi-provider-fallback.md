@@ -92,7 +92,99 @@ function getProviderChain(language, strategy) {
 
 ## 10 Services, Same Pattern
 
-We applied this pattern across 10 different service types:
+We applied this pattern across 10 different service types. Here's exactly how each one works:
+
+### Smart Search — 3 engines
+
+```
+Your query comes in
+  → Tavily search
+  → Failed? → Brave Search
+  → Failed? → Gemini Grounding
+  → Got results → Groq generates AI summary
+  → Returns: 10 results + summary
+```
+
+### Smart LLM — 5 providers, language-aware
+
+```
+Your prompt comes in → detect language
+  CJK (Chinese/Japanese): Gemini → Mistral → Cohere
+  English:                Gemini → Mistral → Cerebras → Groq → Cohere
+```
+
+### Smart Translate — 5 engines
+
+```
+Your text + target language come in
+  → DeepL (best quality)
+  → Failed? → Groq LLM translation
+  → Failed? → Gemini LLM translation
+  → Failed? → Cerebras / Mistral
+  CJK targets: auto-skip Groq/Cerebras (poor CJK output)
+```
+
+### Smart Read — 4 levels
+
+```
+Your URL comes in
+  → Jina Reader converts page to Markdown
+  → Failed? → Firecrawl
+  → Failed? → ScraperAPI
+  → Failed? → Apify
+```
+
+### Smart Embed — 3 engines
+
+```
+Your text comes in
+  → Cohere embedding
+  → Failed? → Gemini
+  → Failed? → Jina
+```
+
+### Smart Extract — Read + LLM pipeline
+
+```
+Your URL + extraction schema come in
+  → Smart Read converts page to text first
+  → LLM converts text to structured JSON
+```
+
+### Smart STT — 2 engines
+
+```
+Your audio file comes in
+  → Deepgram Nova-2
+  → Failed? → AssemblyAI
+```
+
+### Smart TTS — 1 engine
+
+```
+Your text comes in
+  → ElevenLabs text-to-speech
+  → Returns audio file
+```
+
+### Smart Geo — 3 levels
+
+```
+Your address or coordinates come in
+  → Free Geocode API
+  → Failed? → OpenCage
+  → Failed? → Mapbox
+```
+
+### Smart News — 2 engines
+
+```
+Your keywords come in
+  → NewsAPI search
+  → Failed? → Smart Search as fallback
+```
+
+### Summary Table
 
 | Service   | Providers | Fallback Chain                              |
 | --------- | --------- | ------------------------------------------- |
