@@ -210,7 +210,7 @@ Concierge AI:
   → Intent: weather + translate
   → Execute: weather(lat=35.68, lon=139.69) || translate(text, ja)
   → Synthesize: Combined result in natural language
-  → Cost: $0.02 total
+  → Total: ~2 seconds
 ```
 
 **Why this matters for AI agents:**
@@ -230,21 +230,20 @@ Some providers return `200 OK` with an empty body or `{"result": null}`. Your ag
 
 We tried random load balancing first. Bad idea. The best provider should always go first — you're optimizing for quality, not just availability. Fallback is for when quality fails, not for spreading load.
 
-### 4. Language detection is cheap insurance
+### 4. Language detection is lightweight insurance
 
 A simple regex + Unicode range check costs ~0.01ms. It saves you from sending Chinese to Groq and getting English garbage back. **Always detect input language before routing.**
 
-### 5. Price ≠ Quality
+### 5. Don't assume — measure
 
-Free APIs (Gemini, Groq, Cohere) scored higher than some paid ones in our P3 quality exams. Don't assume expensive = better. Test everything.
+Some lesser-known providers (Gemini, Groq, Cohere) scored higher than established ones in our P3 quality exams. Reputation and popularity are not quality indicators. **Always benchmark before choosing.**
 
 ## Numbers
 
 - **31 providers** tested across 4 exam rounds
 - **10 Smart services** with automatic fallback
 - **99.97% effective uptime** (3-5 provider chains)
-- **$0.006–$0.009 per L2 call** (cheaper than most single-provider alternatives)
-- **$0.02 per Concierge call** (AI picks tools + executes + synthesizes)
+- **< 2 seconds** average Concierge response time (intent → execute → synthesize)
 
 ## Try It
 
@@ -270,4 +269,4 @@ Benchmark data: [github.com/sstklen/washin-api-benchmark](https://github.com/sst
 
 ---
 
-*Built at [Washin Village](https://washinmura.jp) — an animal sanctuary in Boso Peninsula, Japan, where 28 cats and dogs fund API infrastructure through a token economy.*
+*Built at [Washin Village](https://washinmura.jp) — an animal sanctuary in Boso Peninsula, Japan, where 28 cats and dogs share a roof with an API engineering team.*
