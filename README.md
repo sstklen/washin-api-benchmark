@@ -118,6 +118,12 @@ These field names are **not** what you'd expect. Getting them wrong = silent fai
 
 ---
 
+## Deep Dive
+
+- **[Why We Built a Multi-Provider Fallback Gateway](docs/why-multi-provider-fallback.md)** — We tested 31 API providers over 4 rounds. Here's what broke, what surprised us, and how we built a 99.97% uptime gateway from unreliable parts.
+
+---
+
 ## About
 
 Published by [washinmura](https://washinmura.jp) — an animal sanctuary in Boso Peninsula, Japan, running an API marketplace for AI Agents.
