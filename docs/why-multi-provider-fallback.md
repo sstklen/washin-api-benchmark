@@ -171,7 +171,7 @@ Your text comes in
 
 ```
 Your address or coordinates come in
-  → Free Geocode API
+  → Nominatim
   → Failed? → OpenCage
   → Failed? → Mapbox
 ```
@@ -195,7 +195,7 @@ Your keywords come in
 | Embedding | 3         | Cohere → Gemini → Jina                      |
 | STT       | 2         | Deepgram → AssemblyAI                       |
 | TTS       | 1         | ElevenLabs                                  |
-| Geocoding | 3         | Free API → OpenCage → Mapbox                |
+| Geocoding | 3         | Nominatim → OpenCage → Mapbox               |
 | News      | 2         | NewsAPI → Smart Search                      |
 | Extract   | 2         | Smart Read + LLM pipeline                   |
 
