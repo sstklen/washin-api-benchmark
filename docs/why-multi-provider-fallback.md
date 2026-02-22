@@ -1,3 +1,5 @@
+**Language:** English | [繁體中文](why-multi-provider-fallback.zh.md) | [日本語](why-multi-provider-fallback.ja.md)
+
 # OpenClaw: Designing the Optimal AI API Route — 31 Providers Tested, 10 Best Paths Found
 
 > AI agents need LLMs, search, translation, voice, and more — but no single provider is the best at everything. We tested 31 API providers across 4 rounds of exams to design the optimal routing for each task. This is the data and thinking behind every routing decision.
