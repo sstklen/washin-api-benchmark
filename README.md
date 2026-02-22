@@ -120,7 +120,7 @@ These field names are **not** what you'd expect. Getting them wrong = silent fai
 
 ## Deep Dive
 
-- **[Same API, Same Model, Same Call: 100 in English, 30 in Chinese](docs/why-multi-provider-fallback.md)** — 31 providers, 3 languages, 4 rounds of exams. The data behind every routing decision, and why language-aware fallback doesn't exist yet.
+- **[OpenClaw: Designing the Optimal AI API Route](docs/why-multi-provider-fallback.md)** — We tested 31 providers to find the best path for every task. The exam data, the routing decisions, and why language-aware fallback matters.
 
 ---
 
