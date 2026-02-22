@@ -120,7 +120,7 @@ These field names are **not** what you'd expect. Getting them wrong = silent fai
 
 ## Deep Dive
 
-- **[Why We Built a Multi-Provider Fallback Gateway](docs/why-multi-provider-fallback.md)** — We tested 31 API providers over 4 rounds. Here's what broke, what surprised us, and how we built a 99.97% uptime gateway from unreliable parts.
+- **[Same API, Same Model, Same Call: 100 in English, 30 in Chinese](docs/why-multi-provider-fallback.md)** — 31 providers, 3 languages, 4 rounds of exams. The data behind every routing decision, and why language-aware fallback doesn't exist yet.
 
 ---
 
