@@ -1,22 +1,60 @@
-**🌐 Language:** English | [繁體中文](README.zh.md) | [日本語](README.ja.md)
+<p align="center">
+  <h1 align="center">AI Agent API Benchmark</h1>
+  <p align="center"><strong>We test 30+ AI APIs every month from Tokyo so you don't have to.</strong></p>
+</p>
 
-# AI Agent API Benchmark — Monthly Report
+<p align="center">
+  <img src="https://img.shields.io/badge/APIs_Tested-30+-blue?style=for-the-badge" alt="APIs Tested"/>
+  <img src="https://img.shields.io/badge/Updated-Feb_2026-green?style=for-the-badge" alt="Last Updated"/>
+  <img src="https://img.shields.io/badge/Location-Tokyo_🗼-red?style=for-the-badge" alt="Location"/>
+  <img src="https://img.shields.io/badge/Sponsors-Zero-orange?style=for-the-badge" alt="No Sponsors"/>
+</p>
 
-> **We test 30+ AI APIs every month so you don't have to.**
-> Open methodology. No sponsors. Real data from Tokyo.
+<p align="center">
+  <a href="https://github.com/sstklen/washin-api-benchmark/stargazers"><img src="https://img.shields.io/github/stars/sstklen/washin-api-benchmark?style=social" alt="Stars"/></a>
+  <a href="https://api.washinmura.jp/api-benchmark/en/">🌐 Interactive Report</a> ·
+  <a href="https://api.washinmura.jp/mcp/free">📡 Free MCP Server</a> ·
+  <a href="https://api.washinmura.jp/docs">📖 API Docs</a>
+</p>
 
-🌐 **Full Interactive Report:** [English](https://api.washinmura.jp/api-benchmark/en/) | [繁體中文](https://api.washinmura.jp/api-benchmark/zh/) | [日本語](https://api.washinmura.jp/api-benchmark/ja/)
-
-📡 **Try these APIs instantly:** [MCP Server (free)](https://api.washinmura.jp/mcp/free) | [API Docs](https://api.washinmura.jp/docs)
+<p align="center"><sub>🌐 <a href="README.zh.md">繁體中文</a> · <a href="README.ja.md">日本語</a></sub></p>
 
 ---
 
-## February 2026 Results
+## 🤯 3 Things We Discovered This Month
 
-**Tested:** 15 LLMs · 3 Search Engines · 5 Translation · 3 Voice · 6 Data Services
-**Date:** 2026-02-20 · **Location:** Tokyo, Japan · **Method:** 4 rounds per API
+> *These findings are from real API calls, not marketing pages.*
 
-### 🏆 LLM Quality Ranking (Top 15)
+### GPT-4o-mini can't do basic math
+
+We asked every LLM: *"A shelter has 28 animals. 3/7 are cats. Cats eat 2kg/month, others 1.5kg. Total feed?"*
+
+GPT-4o-mini answered **54**. The correct answer is **48**.
+
+**Reasoning score: 30/100.** If your AI Agent does calculations with GPT-4o-mini, you have a problem.
+
+### A free 8B model beats GPT
+
+| Model | Score | Speed | Cost |
+|-------|-------|-------|------|
+| Cerebras llama3.1-8b | **92** | ⚡ 316ms | Free |
+| GPT-4o-mini | **82** | 1631ms | Paid |
+
+An 8-billion-parameter open-source model, running for free, outperforms GPT-4o-mini in quality *and* speed.
+
+### Fastest ≠ Best (the multilingual trap)
+
+Groq is 8x faster than average (306ms). Looks amazing on paper.
+
+But Chinese accuracy: **30/100**. If your users speak anything other than English, pure speed is a trap.
+
+---
+
+## 🏆 February 2026 Rankings
+
+**15 LLMs · 3 Search · 5 Translation · 3 Voice · 6 Data** — tested from Tokyo, 4 rounds each
+
+### LLM Quality
 
 | # | Model | Score | Speed | Reasoning | Code | CN/JP/EN |
 |---|-------|-------|-------|-----------|------|----------|
@@ -33,73 +71,57 @@
 | 11 | Cohere Command R7B | 78 | 393ms | ✅ 100 | ✅ 100 | 100/100/0 |
 | 11 | Mistral Codestral | 78 | 479ms | ❌ 30 | 60 | 100/100/100 |
 
-> **Reasoning test:** "A shelter has 28 animals. 3/7 are cats. Cats eat 2kg/month, others eat 1.5kg/month. Total monthly feed?" (Answer: 48kg)
-
-### 🔍 Search Engines
+### Search Engines
 
 | Provider | Score | Speed | Results | Best For |
 |----------|-------|-------|---------|----------|
-| **Brave Search** | 100 | 1124ms | 10 per query | Volume (most results) |
-| **Tavily** | 100 | 1536ms | 5 per query | Quality + AI-ready |
-| **Serper (Google)** | 100 | 537ms | 8 per query | Speed + Google data |
+| **Brave Search** | 100 | 1124ms | 10/query | Volume |
+| **Tavily** | 100 | 1536ms | 5/query | AI-ready quality |
+| **Serper (Google)** | 100 | 537ms | 8/query | Speed + Google data |
 
-### 🌐 Translation
+### Translation
 
-| Provider | Score | Speed | Best For |
-|----------|-------|-------|----------|
-| **Groq Translate** | 94 | 526ms | Best quality (free) |
-| **DeepL** | 93 | 641ms | Professional use |
-| **Cerebras Translate** | 94 | 335ms | Fastest + quality |
+| Provider | Score | Speed | Cost |
+|----------|-------|-------|------|
+| **Cerebras Translate** | 94 | ⚡ 335ms | Free |
+| **Groq Translate** | 94 | 526ms | Free |
+| **DeepL** | 93 | 641ms | Paid |
 
-> 💡 Free LLM-based translation (Groq/Cerebras) scores **higher** than DeepL.
+> Free LLM-based translation now scores **higher** than DeepL.
 
-### 📊 Summary Stats
+### At a Glance
 
 | Metric | Value |
 |--------|-------|
 | API Connectivity | 86.7% (26/30 passed) |
 | 24h Stability | 96.9% (31/32 stable) |
 | Fastest LLM | Groq 306ms |
-| Highest LLM Score | 93 (Gemini 2.5 Flash / xAI Grok) |
+| Best Overall | Gemini 2.5 Flash (93pts) |
 
 ---
 
-## 3 Surprising Findings
+## 🛠️ Pick Your Stack
 
-### 1. 🤯 GPT-4o-mini Can't Do Basic Math
-Asked "17 + 35" → Answered **54** (correct: 48 for the full problem). Reasoning score: 30/100.
-If your AI Agent relies on GPT-4o-mini for calculations, you have a problem.
+Building an AI Agent? Here's what we'd use based on the data:
 
-### 2. 💪 A Free 8B Model Beats GPT
-Cerebras llama3.1-8b (free, 8 billion parameters) scored **92** vs GPT-4o-mini's **82**.
-316ms latency. Free. Better than GPT.
-
-### 3. ⚡ Fastest ≠ Best
-Groq is 8x faster than the average (306ms), but Chinese score collapsed to **30/100**.
-Speed without multilingual quality is a trap for non-English agents.
-
----
-
-## Use Case Recommendations
-
-| Scenario | Recommended Stack |
-|----------|-------------------|
-| **Research Agent** | Brave Search → Firecrawl → Gemini 2.5 Flash |
-| **Chat Agent (realtime)** | Groq 306ms (English) / Mistral Small 557ms (multilingual) |
-| **Translation Agent** | Groq Translate (94pts) or DeepL (93pts) |
-| **Math/Reasoning** | Gemini 2.5 Flash or DeepSeek Chat (both 100) |
-| **Code Generation** | Gemini 2.5 Flash / xAI Grok / Cerebras 8B (all 100) |
-| **Voice Assistant** | AssemblyAI STT → Groq LLM → ElevenLabs TTS |
-| **News Monitoring** | Brave Search + NewsAPI → Mistral Small |
+| Your Agent Does... | Recommended Stack | Why |
+|--------------------|-------------------|-----|
+| **Research** | Brave Search → Firecrawl → Gemini 2.5 Flash | Best quality + multilingual |
+| **Realtime Chat** | Groq 306ms (EN) / Mistral Small 557ms (multilingual) | Speed vs language trade-off |
+| **Translation** | Cerebras Translate (94pts, free, 335ms) | Beats DeepL, costs nothing |
+| **Math/Reasoning** | Gemini 2.5 Flash or DeepSeek Chat | Both score 100 on reasoning |
+| **Code Gen** | Gemini 2.5 Flash / xAI Grok / Cerebras 8B | All score 100 on code |
+| **Voice** | AssemblyAI STT → Groq LLM → ElevenLabs TTS | Best pipeline we've found |
+| **News** | Brave Search + NewsAPI → Mistral Small | Volume + multilingual |
 
 ---
 
-## ⚠️ 5 API Field Name Traps
+## ⚠️ API Field Name Traps
 
-These field names are **not** what you'd expect. Getting them wrong = silent failures:
+We learned these the hard way. Getting them wrong = silent failures:
 
-| API | ❌ Expected | ✅ Actual |
-|-----|------------|-----------|
+| API | ❌ You'd expect | ✅ Actually |
+|-----|----------------|-------------|
 | Vision | `imageUrl` | `image` |
 | Geocode | `query` | `q` |
 | CoinGecko | `coin` | `coins` |
@@ -108,35 +130,43 @@ These field names are **not** what you'd expect. Getting them wrong = silent fai
 
 ---
 
-## Methodology
+## 📐 Methodology
 
-1. **Real API calls** — No synthetic benchmarks. Every number is from a real HTTP request.
-2. **4 rounds per API** — Each test runs 4 times to account for variance.
-3. **From Tokyo** — All tests run from a Tokyo server (AWS ap-northeast-1).
-4. **Open scoring** — Reasoning = math correctness, Code = function output, Multilingual = accuracy in CN/JP/EN.
-5. **No sponsors** — Rankings are purely data-driven. We pay for all API access ourselves.
+| Aspect | How |
+|--------|-----|
+| **Data** | Real HTTP requests, not synthetic benchmarks |
+| **Rounds** | 4 per API to account for variance |
+| **Location** | Tokyo server (AWS ap-northeast-1) |
+| **Scoring** | Reasoning = math correctness, Code = function output, Multilingual = CN/JP/EN accuracy |
+| **Bias** | Zero sponsors. We pay for everything ourselves |
 
 ---
 
-## Deep Dive
+## 📅 Get Next Month's Report
 
-- **[OpenClaw: Designing the Optimal AI API Route](docs/why-multi-provider-fallback.md)** — We tested 31 providers to find the best path for every task. The exam data, the routing decisions, and why language-aware fallback matters.
+**⭐ Star this repo** to get notified when March 2026 results drop.
+
+We publish on the 20th of every month.
+
+| Month | Status |
+|-------|--------|
+| February 2026 | ✅ Published |
+| March 2026 | 🔜 Coming |
+
+---
+
+## 🔗 Deep Dive
+
+- **[Designing the Optimal AI API Route](docs/why-multi-provider-fallback.md)** — We tested 31 providers to find the best path for every task. The exam data, the routing decisions, and why language-aware fallback matters.
 
 ---
 
 ## About
 
-Published by [washinmura](https://washinmura.jp) — an animal sanctuary in Boso Peninsula, Japan, running an API marketplace for AI Agents.
+Published by **[Washin Village](https://washinmura.jp)** — an animal sanctuary in Boso Peninsula, Japan, building an API marketplace for AI Agents.
 
-- 🐾 28 cats & dogs
-- 🤖 30+ API services
-- 📊 Monthly benchmarks since February 2026
-
-**Next report:** March 2026
-
----
+🐾 28 cats & dogs · 🤖 30+ APIs · 📊 Monthly benchmarks
 
 ## License
 
-Data and reports are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-You may share and adapt with attribution.
+Data and reports: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Share and adapt with attribution.
