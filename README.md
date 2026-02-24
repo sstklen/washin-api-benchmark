@@ -1,171 +1,129 @@
 <p align="center">
-  <h1 align="center">AI Agent API Benchmark</h1>
-  <p align="center"><strong>We test 30+ AI APIs every month from Tokyo so you don't have to.</strong></p>
+  <h1 align="center">From Benchmarks to Architecture</h1>
+  <p align="center"><strong>We tested 30+ AI APIs. Designed routing from the data. Then Anthropic published a paper describing the same architecture.</strong></p>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/APIs_Tested-30+-blue?style=for-the-badge" alt="APIs Tested"/>
-  <img src="https://img.shields.io/badge/Updated-Feb_2026-green?style=for-the-badge" alt="Last Updated"/>
+  <img src="https://img.shields.io/badge/Articles-3_Part_Series-green?style=for-the-badge" alt="3 Articles"/>
   <img src="https://img.shields.io/badge/Location-Tokyo_🗼-red?style=for-the-badge" alt="Location"/>
   <img src="https://img.shields.io/badge/Sponsors-Zero-orange?style=for-the-badge" alt="No Sponsors"/>
 </p>
 
 <p align="center">
   <a href="https://github.com/sstklen/washin-api-benchmark/stargazers"><img src="https://img.shields.io/github/stars/sstklen/washin-api-benchmark?style=social" alt="Stars"/></a>
-  <a href="https://api.washinmura.jp/api-benchmark/en/">🌐 Interactive Report</a> ·
-  <a href="https://api.washinmura.jp/mcp/free">📡 Free MCP Server</a> ·
-  <a href="https://api.washinmura.jp/docs">📖 API Docs</a>
 </p>
 
-<p align="center"><sub>🌐 <a href="README.zh.md">繁體中文</a> · <a href="README.ja.md">日本語</a></sub></p>
+---
+
+## The Stack
+
+Three articles. Each one builds on the previous. Together, they're the complete story of how we built intelligent API routing — from raw data to production architecture.
+
+```
+Article 1: OBSERVE     — Benchmark 30+ APIs (who's fast, who's accurate, who lies)
+    ↓
+Article 2: DESIGN      — Use exam data to design multi-provider routing
+    ↓
+Article 3: ARCHITECT   — Build L1→L4, then Anthropic publishes the same patterns
+```
+
+This is [Observability-Driven Routing](https://en.wikipedia.org/wiki/Observability_(software)): measure first, decide from data, automate decisions, verify results. We didn't know it had a name. We just kept solving the next problem.
 
 ---
 
-## 🤯 3 Things We Discovered This Month
+## Article 1: The Benchmark
 
-> *These findings are from real API calls, not marketing pages.*
+**[30+ AI APIs Tested from Tokyo — February 2026](docs/01-benchmark-2026-02.md)**
 
-### GPT-4o-mini can't do basic math
+15 LLMs, 3 search engines, 5 translation APIs, 3 voice APIs, 6 data APIs. Four rounds of real HTTP requests, not synthetic benchmarks.
 
-We asked every LLM: *"A shelter has 28 animals. 3/7 are cats. Cats eat 2kg/month, others 1.5kg. Total feed?"*
+**Key findings:**
 
-GPT-4o-mini answered **54**. The correct answer is **48**.
+| Discovery | Why it matters |
+|-----------|---------------|
+| GPT-4o-mini can't do basic math (30/100 reasoning) | Don't trust brand names |
+| Free 8B model beats GPT (Cerebras 92 vs GPT 82) | Cost ≠ quality |
+| Groq is 8x faster but scores 30/100 on Chinese | Speed ≠ quality across languages |
+| Free LLM translation beats DeepL (94 vs 93) | Dedicated APIs aren't always better |
 
-**Reasoning score: 30/100.** If your AI Agent does calculations with GPT-4o-mini, you have a problem.
-
-### A free 8B model beats GPT
-
-| Model | Score | Speed | Cost |
-|-------|-------|-------|------|
-| Cerebras llama3.1-8b | **92** | ⚡ 316ms | Free |
-| GPT-4o-mini | **82** | 1631ms | Paid |
-
-An 8-billion-parameter open-source model, running for free, outperforms GPT-4o-mini in quality *and* speed.
-
-### Fastest ≠ Best (the multilingual trap)
-
-Groq is 8x faster than average (306ms). Looks amazing on paper.
-
-But Chinese accuracy: **30/100**. If your users speak anything other than English, pure speed is a trap.
+> *If we'd picked providers by reputation instead of data, we'd have chosen wrong on every one of these.*
 
 ---
 
-## 🏆 February 2026 Rankings
+## Article 2: The Routing Design
 
-**15 LLMs · 3 Search · 5 Translation · 3 Voice · 6 Data** — tested from Tokyo, 4 rounds each
+**[31 Providers Tested, 10 Best Paths Found](docs/02-multi-provider-routing.md)**
 
-### LLM Quality
+The benchmark data revealed a critical insight: **no single provider is best at everything.** Groq is fastest but fails on Chinese. Cerebras scores highest but can't do Japanese. GPT-4o-mini handles all languages but can't do math.
 
-| # | Model | Score | Speed | Reasoning | Code | CN/JP/EN |
-|---|-------|-------|-------|-----------|------|----------|
-| 🥇 | **Gemini 2.5 Flash** | **93** | 990ms | ✅ 100 | ✅ 100 | 100/100/100 |
-| 🥈 | **xAI Grok 4.1 Fast** | **93** | 1621ms | ✅ 100 | ✅ 100 | 100/100/100 |
-| 🥉 | **Cerebras llama3.1-8b** | **92** | ⚡ 316ms | ✅ 100 | ✅ 100 | 30/60/60 |
-| 4 | Gemini 2.0 Flash | 88 | 668ms | ❌ 30 | ✅ 100 | 100/100/100 |
-| 5 | DeepSeek Chat | 87 | 1046ms | ✅ 100 | 60 | 100/100/100 |
-| 5 | Mistral Small | 87 | 557ms | ✅ 100 | 60 | 100/100/100 |
-| 7 | DeepSeek Reasoner (R1) | 83 | 2696ms | ✅ 100 | 0 | 100/100/100 |
-| 7 | Groq llama-3.3-70b | 83 | ⚡ 306ms | ✅ 100 | 60 | 30/100/100 |
-| 9 | OpenAI GPT-4o-mini | 82 | 1631ms | ❌ 30 | 60 | 100/100/100 |
-| 10 | Cerebras GPT-OSS-120B | 80 | 382ms | ✅ 100 | 20 | 100/100/100 |
-| 11 | Cohere Command R7B | 78 | 393ms | ✅ 100 | ✅ 100 | 100/100/0 |
-| 11 | Mistral Codestral | 78 | 479ms | ❌ 30 | 60 | 100/100/100 |
+So we designed **language-aware, quality-driven routing** — different provider chains for different languages and tasks, all driven by exam data.
 
-### Search Engines
+**Key insight:** A provider scoring 100 in English and 30 in Chinese isn't a bug in our test. It's a 70-point quality collapse that's completely invisible to monitoring (valid 200 OK, well-formed JSON). Our routing catches this. No existing API gateway does.
 
-| Provider | Score | Speed | Results | Best For |
-|----------|-------|-------|---------|----------|
-| **Brave Search** | 100 | 1124ms | 10/query | Volume |
-| **Tavily** | 100 | 1536ms | 5/query | AI-ready quality |
-| **Serper (Google)** | 100 | 537ms | 8/query | Speed + Google data |
-
-### Translation
-
-| Provider | Score | Speed | Cost |
-|----------|-------|-------|------|
-| **Cerebras Translate** | 94 | ⚡ 335ms | Free |
-| **Groq Translate** | 94 | 526ms | Free |
-| **DeepL** | 93 | 641ms | Paid |
-
-> Free LLM-based translation now scores **higher** than DeepL.
-
-### At a Glance
-
-| Metric | Value |
-|--------|-------|
-| API Connectivity | 86.7% (26/30 passed) |
-| 24h Stability | 96.9% (31/32 stable) |
-| Fastest LLM | Groq 306ms |
-| Best Overall | Gemini 2.5 Flash (93pts) |
+Available in: [English](docs/02-multi-provider-routing.md) · [繁體中文](docs/02-multi-provider-routing.zh.md) · [日本語](docs/02-multi-provider-routing.ja.md)
 
 ---
 
-## 🛠️ Pick Your Stack
+## Article 3: The Architecture ⭐ NEW
 
-Building an AI Agent? Here's what we'd use based on the data:
+**[Token 76% Down, Cost 96% Down, 4.6x Faster — Reading Anthropic's Tool Use Paper, 4 Commits Same Day](docs/03-anthropic-advanced-tool-use.md)**
 
-| Your Agent Does... | Recommended Stack | Why |
-|--------------------|-------------------|-----|
-| **Research** | Brave Search → Firecrawl → Gemini 2.5 Flash | Best quality + multilingual |
-| **Realtime Chat** | Groq 306ms (EN) / Mistral Small 557ms (multilingual) | Speed vs language trade-off |
-| **Translation** | Cerebras Translate (94pts, free, 335ms) | Beats DeepL, costs nothing |
-| **Math/Reasoning** | Gemini 2.5 Flash or DeepSeek Chat | Both score 100 on reasoning |
-| **Code Gen** | Gemini 2.5 Flash / xAI Grok / Cerebras 8B | All score 100 on code |
-| **Voice** | AssemblyAI STT → Groq LLM → ElevenLabs TTS | Best pipeline we've found |
-| **News** | Brave Search + NewsAPI → Mistral Small | Volume + multilingual |
+Anthropic published ["Advanced Tool Use"](https://www.anthropic.com/engineering/advanced-tool-use) describing three techniques: Tool Search, Tool Use Examples, and Programmatic Tool Calling.
 
----
+We read it. Recognized the same patterns we'd been building. Implemented two features the same day. And realized we'd independently built four things they hadn't described.
 
-## ⚠️ API Field Name Traps
+| What Anthropic published | What we already had | What we built after reading |
+|---|---|---|
+| Tool Search (85% token reduction) | — | Defer loading: 10.8KB→2.5KB (**76%↓**), same day |
+| Tool Use Examples (72%→90% accuracy) | — | 11 endpoints with real JSON examples, same day |
+| Dynamic Filtering | L2 Smart Gateway (strategy routing) | — |
+| Programmatic Tool Calling (37% token↓) | L4 Task Engine | PTC mode: **$0.02 vs $0.49 (96%↓)**, same day |
 
-We learned these the hard way. Getting them wrong = silent failures:
-
-| API | ❌ You'd expect | ✅ Actually |
-|-----|----------------|-------------|
-| Vision | `imageUrl` | `image` |
-| Geocode | `query` | `q` |
-| CoinGecko | `coin` | `coins` |
-| Serper | `results` | `organic` |
-| X Search | `results` | `tweets` |
+**What we have that they didn't describe:**
+- Multi-provider fallback chains (L2) — because the right tool can still go down
+- Exam-driven routing (P1-P4) — because static examples go stale
+- Intent routing (L3) — because agents don't always know which tool to call
+- Post-execution quality signals (L4 Phase 3) — because knowing it ran ≠ knowing it worked
 
 ---
 
-## 📐 Methodology
+## Why This Matters
 
-| Aspect | How |
-|--------|-----|
-| **Data** | Real HTTP requests, not synthetic benchmarks |
-| **Rounds** | 4 per API to account for variance |
-| **Location** | Tokyo server (AWS ap-northeast-1) |
-| **Scoring** | Reasoning = math correctness, Code = function output, Multilingual = CN/JP/EN accuracy |
-| **Bias** | Zero sponsors. We pay for everything ourselves |
+Companies working on similar problems: Martian (LLM Router), Not Diamond (Model Router), Portkey, LiteLLM (AI Gateway). They all solve pieces of this puzzle.
 
----
+What makes our approach different:
 
-## 📅 Get Next Month's Report
+| | Existing AI Gateways | Our Approach |
+|---|---|---|
+| Routing basis | Static config or cost | **Exam data + live performance** |
+| Language awareness | None | **Per-language provider ranking** |
+| Fallback | Simple retry | **4-deep provider chain with different timeouts** |
+| Quality check | None | **Post-execution scoring (0-1)** |
+| Intent routing | None | **Natural language → auto tool selection** |
 
-**⭐ Star this repo** to get notified when March 2026 results drop.
-
-We publish on the 20th of every month.
-
-| Month | Status |
-|-------|--------|
-| February 2026 | ✅ Published |
-| March 2026 | 🔜 Coming |
+We're not a company. We're an animal sanctuary in rural Japan that needed APIs to work reliably. The architecture emerged from solving real problems, one layer at a time.
 
 ---
 
-## 🔗 Deep Dive
+## Who We Are
 
-- **[Designing the Optimal AI API Route](docs/why-multi-provider-fallback.md)** — We tested 31 providers to find the best path for every task. The exam data, the routing decisions, and why language-aware fallback matters.
+**[Washin Village](https://washinmura.jp)** (和心村) — an animal sanctuary on Japan's Boso Peninsula. 28 cats & dogs. Zero engineering background. Built a production API platform with AI coding agents in 7 months.
+
+The benchmarks, the routing design, and the architecture — all open. Because the problems are universal, and the solutions should be too.
 
 ---
 
-## About
+## Related
 
-Published by **[Washin Village](https://washinmura.jp)** — an animal sanctuary in Boso Peninsula, Japan, building an API marketplace for AI Agents.
+| Project | What it does |
+|---------|-------------|
+| [Zero Engineer](https://github.com/sstklen/zero-engineer) | The full story: animal sanctuary → production API platform |
+| [112 Claude Code Skills](https://github.com/sstklen/washin-claude-skills) | Every production bug fix as a reusable skill |
+| [crawl-share](https://github.com/sstklen/crawl-share) | 200+ Apify actors battle-tested, community-shared |
+| [Confucius Debug](https://github.com/sstklen/yanhui-ci) | Debug AI with 4,300+ shared solutions |
 
-🐾 28 cats & dogs · 🤖 30+ APIs · 📊 Monthly benchmarks
+---
 
 ## License
 
