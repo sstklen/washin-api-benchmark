@@ -1,54 +1,56 @@
-# Token 省 76%、費用降 96%、快 4.6 倍——讀完 Anthropic Tool Use 論文，4 commits 當天落地
+**Language:** English | [繁體中文](03-anthropic-advanced-tool-use.zh.md) | [日本語](03-anthropic-advanced-tool-use.ja.md)
 
-> Anthropic 發表 [Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use)，提出三個功能。我們在日本鄉下經營 39 服務的 API 平台，讀完當天全部落地——還多做了四件他們沒做的事。
+# Token 76% Down, Cost 96% Down, 4.6x Faster — Reading Anthropic's Tool Use Paper, 4 Commits Same Day
 
----
-
-## 全貌
-
-| Anthropic 功能                  | 他們的數據                  | 我們做了什麼                          |
-| ----------------------------- | ---------------------- | ------------------------------- |
-| **Tool Search**               | 77K→8.7K tokens (85%↓) | 10.8KB→2.5KB，按需載入 (**76%↓**)    |
-| **Tool Use Examples**         | 準確率 72%→90%            | 11 個端點加真實 JSON 範例               |
-| **Programmatic Tool Calling** | tokens 37%↓            | PTC 模式：**$0.02 vs $0.49，省 96%** |
-
-| 我們多做的            | 一句話                   |
-| ---------------- | --------------------- |
-| **容錯鏈** (L2)     | 選對也會掛，4 層 fallback 接住 |
-| **考試路由** (P1-P4) | 持續考試驅動供應商排名           |
-| **意圖路由** (L3)    | 說人話，系統自己選工具           |
-| **品質信號** (L4)    | 給機器讀的結果品質分數           |
+> Anthropic published [Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use), proposing three features. We run a 39-service API platform from rural Japan. Read the paper, shipped all three the same day — plus four things they didn't do.
 
 ---
 
-## 背景：痛點逼出來的四層
+## The Full Picture
+
+| Anthropic Feature             | Their Numbers              | What We Did                            |
+| ----------------------------- | -------------------------- | -------------------------------------- |
+| **Tool Search**               | 77K→8.7K tokens (85%↓)    | 10.8KB→2.5KB, load on demand (**76%↓**) |
+| **Tool Use Examples**         | Accuracy 72%→90%           | Real JSON examples on 11 endpoints      |
+| **Programmatic Tool Calling** | tokens 37%↓               | PTC mode: **$0.02 vs $0.49, 96% off**  |
+
+| What We Added         | One Line                                        |
+| --------------------- | ----------------------------------------------- |
+| **Fallback Chain** (L2)    | Picking the right tool doesn't mean it won't fail. 4-layer fallback catches it. |
+| **Exam Routing** (P1-P4)  | Continuous exams drive provider rankings          |
+| **Intent Routing** (L3)   | Speak plain language, system picks the tool       |
+| **Quality Signal** (L4)   | Machine-readable result quality scores            |
+
+---
+
+## Background: Four Layers Born from Pain
 
 ```
-L1  Proxy        — 純轉發（27 端點）         $0-$0.01
-L2  Smart Gateway — 多供應商容錯 + 策略路由    $0.006-$0.009
-L3  Concierge    — 自然語言 → 自動選工具      $0.02
-L4  Task Engine  — 規劃 → 執行 → 品質評估     $0.49-$2.99
+L1  Proxy        — Pure passthrough (27 endpoints)     $0-$0.01
+L2  Smart Gateway — Multi-provider fallback + routing   $0.006-$0.009
+L3  Concierge    — Natural language → auto tool select  $0.02
+L4  Task Engine  — Plan → Execute → Quality eval        $0.49-$2.99
 ```
 
-不是先畫架構圖再蓋的。L1 純轉發。L2 是 Brave 掛了兩小時、客戶全拿 500 error 後加的容錯鏈。L3 是 Agent 不知道叫 search 還是 news、也不知道要先翻日文後加的意圖路由。L4 是「比較三個翻譯 API 品質」這種多步驟任務搞不定後加的。每層都是一個痛點。
+None of this was designed on a whiteboard first. L1 is plain proxying. L2 was added after Brave went down for two hours and every client got 500 errors. L3 was added after Agents couldn't figure out whether to call search or news — or that they needed to translate to Japanese first. L4 was added after multi-step tasks like "compare quality across three translation APIs" kept failing. Every layer exists because of a specific pain point.
 
 ---
 
-## 對照：Anthropic 三功能
+## Side by Side: Anthropic's Three Features
 
-### Tool Search → defer_loading（省 76%）
+### Tool Search → defer_loading (76% Savings)
 
-> *「With 200+ tools, the traditional approach consumed approximately 77K input tokens before any actual work began... With the Tool Search Tool, initial token consumption drops to approximately 8.7K.」*
+> *"With 200+ tools, the traditional approach consumed approximately 77K input tokens before any actual work began... With the Tool Search Tool, initial token consumption drops to approximately 8.7K."*
 
-我們的 `/api/capabilities` 一口氣回 10.8KB。讀到論文後當天拆成兩層：
+Our `/api/capabilities` returned 10.8KB in one shot. After reading the paper, we split it into two tiers the same day:
 
 ```bash
-GET /api/services/brief     # 2.5KB 菜單
-GET /api/services/{id}      # ~300B 按需
+GET /api/services/brief     # 2.5KB menu
+GET /api/services/{id}      # ~300B on demand
 ```
 
 ```json
-// GET /api/services/brief 回傳（節錄）
+// GET /api/services/brief response (excerpt)
 {
   "v": "2.0", "total": 39,
   "services": [
@@ -62,56 +64,56 @@ GET /api/services/{id}      # ~300B 按需
 }
 ```
 
-| 之前                     | 之後                  | 節省      |
+| Before                   | After               | Savings |
 | ---------------------- | ------------------- | ------- |
 | 10.8KB (~2,700 tokens) | 2.5KB (~640 tokens) | **76%** |
 
-Anthropic 在模型端（Claude 自己搜，用 `defer_loading: true`），我們在 API 端（Agent 自己載，拆成兩個端點）。他們的更優雅，我們的更直接。原理一樣：**先給菜單，再上菜。**
+Anthropic does it model-side (Claude searches internally, using `defer_loading: true`). We do it API-side (Agent loads what it needs, two endpoints). Theirs is more elegant. Ours is more direct. Same principle: **show the menu first, serve the dish later.**
 
-**學到什麼：** Anthropic 幫我們命名了問題（`defer_loading`）、量化了影響（85%↓ + Opus 4 準確率 49%→74%）、給了實作方向。「覺得太肥」跟「知道怎麼改」是兩回事。
+**What we learned:** Anthropic gave us a name for the problem (`defer_loading`), quantified the impact (85%↓ + Opus 4 accuracy 49%→74%), and pointed us toward an implementation. "Feeling like it's too bloated" and "knowing exactly how to fix it" are two different things.
 
 ---
 
-### Tool Use Examples（Anthropic 實測 +18% 準確率）
+### Tool Use Examples (Anthropic measured +18% accuracy)
 
-> *「Adding concrete examples to tool definitions improved accuracy from 72% to 90% on complex parameter handling.」*
+> *"Adding concrete examples to tool definitions improved accuracy from 72% to 90% on complex parameter handling."*
 
-我們文件有 URL 有參數——唯獨沒範例。Agent 在猜格式：
+Our docs had URLs and parameters — but zero examples. Agents were guessing formats:
 
 ```
-猜的：{"search": "renewable energy Japan"}         ← 欄位名錯了
-正確：{"query": "renewable energy Japan", "strategy": "fast"}
+Guessed: {"search": "renewable energy Japan"}         ← wrong field name
+Correct: {"query": "renewable energy Japan", "strategy": "fast"}
 ```
 
-當天 11 個端點全加真實 JSON 請求+回應範例：
+Same day, added real JSON request + response examples to all 11 endpoints:
 
 ```
 ## POST /api/v2/search
-### 請求範例：
+### Request Example:
 {"query": "renewable energy Japan 2025", "strategy": "fast", "maxResults": 10}
-### 回應範例：
+### Response Example:
 {"results": [...], "provider": "brave", "responseTimeMs": 420, "cost": "$0.009"}
 ```
 
-**花幾個月蓋的容錯鏈，可能比不上花一天加的範例——範例從源頭減少錯誤呼叫。Agent 不打客服電話，只看文件。**
+**Months of building fallback chains might matter less than one day of adding examples — examples eliminate bad calls at the source. Agents don't call support. They read the docs.**
 
 ---
 
-### Programmatic Tool Calling → PTC（省 96% 費用）
+### Programmatic Tool Calling → PTC (96% Cost Reduction)
 
-> *「Programmatic Tool Calling enables Claude to write and execute code that orchestrates multiple tool calls... On complex research tasks, this approach reduced average token usage from 43,588 to 27,297 — a 37% reduction.」*
+> *"Programmatic Tool Calling enables Claude to write and execute code that orchestrates multiple tool calls... On complex research tasks, this approach reduced average token usage from 43,588 to 27,297 — a 37% reduction."*
 
-我們的 L4 已有三階段（規劃→執行→品質評估）。讀完論文加了 PTC——Agent 自帶步驟，跳過 LLM 規劃：
+Our L4 already had three phases (plan → execute → quality eval). After reading the paper, we added PTC — Agents bring their own steps, skip the LLM planning phase:
 
 ```json
-// PTC Mode — Agent 自帶執行計畫
+// PTC Mode — Agent brings its own execution plan
 POST /api/v2/task
 {"goal": "Search and summarize AI news", "steps": [
   {"toolId": "smart-search", "params": {"query": "AI agent news 2026"}},
   {"toolId": "smart-llm", "params": {"prompt": "Summarize"}, "dependsOn": [1]}
 ]}
 
-// 回傳
+// Response
 {"success": true, "mode": "ptc", "synthesis": "...",
  "meta": {"price": 0.02, "execution": [
    {"step": 1, "tool": "smart-search", "responseTimeMs": 1408},
@@ -119,120 +121,121 @@ POST /api/v2/task
  ], "totalTimeMs": 3979}}
 ```
 
-| 場景    | Auto        | PTC         | 節省           |
-| ----- | ----------- | ----------- | ------------ |
-| 單步查詢  | ~12s, $0.49 | 2.8s, $0.02 | 快 4x，省 96%   |
-| 搜尋+摘要 | ~18s, $0.49 | 3.9s, $0.02 | 快 4.6x，省 96% |
+| Scenario       | Auto        | PTC         | Savings          |
+| -------------- | ----------- | ----------- | ---------------- |
+| Single query   | ~12s, $0.49 | 2.8s, $0.02 | 4x faster, 96% off   |
+| Search+summary | ~18s, $0.49 | 3.9s, $0.02 | 4.6x faster, 96% off |
 
-Anthropic 讓 Claude 寫 Python 編排（更靈活）。我們讓 Agent 提交 JSON 步驟（更可靠，每步有 L2 容錯）。Agent 付了錢，要的是結果，不是一個可能會跑的 Python script。
+Anthropic lets Claude write Python to orchestrate (more flexible). We let Agents submit JSON steps (more reliable — every step has L2 fallback). Agents are paying for results, not for a Python script that might run.
 
 ---
 
-## 我們多做的四件事
+## Four Things We Did That They Didn't
 
-### 容錯鏈——選對了也會掛
+### Fallback Chain — Picking the Right Tool Doesn't Mean It Won't Fail
 
-Anthropic 假設選對工具就會拿到結果。生產環境裡，**選對了也會掛。**
+Anthropic assumes that picking the right tool means you get a result. In production, **picking the right tool doesn't mean it won't fail.**
 
 ```
-Agent 叫 POST /api/v2/search
+Agent calls POST /api/v2/search
   → Brave (8s) → Tavily (10s) → Firecrawl (20s) → Gemini (20s)
-  Agent 完全感知不到這條鏈。
+  Agent is completely unaware of this chain.
 ```
 
-**真實案例：** 某天下午 Brave 掛了 6 分鐘：
+**Real incident:** One afternoon, Brave went down for 6 minutes:
 
 ```
-14:25  Brave timeout → fallback Tavily → 成功，1200ms
-14:31  Brave 恢復。客戶完全不知道。
+14:25  Brave timeout → fallback Tavily → success, 1200ms
+14:31  Brave recovered. Client never noticed.
 ```
 
-沒有容錯鏈？6 分鐘的 500 error。有容錯鏈？`provider` 從 `"brave"` 變 `"tavily"`，結果照回。
+Without fallback chain? 6 minutes of 500 errors. With fallback chain? `provider` changes from `"brave"` to `"tavily"`, results come back as normal.
 
 ---
 
-### 考試路由（P1-P4）——靜態範例會過時
+### Exam Routing (P1-P4) — Static Examples Go Stale
 
-Anthropic 說加範例準確率 +18%。但**靜態範例會過時。** 上個月最好的供應商，這個月可能降級了。
+Anthropic says adding examples improves accuracy by +18%. But **static examples go stale.** Last month's best provider might be degraded this month.
 
-| 考試     | 問什麼     | 頻率   | 驅動什麼           |
-| ------ | ------- | ---- | -------------- |
-| **P1** | 端點活著嗎？  | 每 6h | 移出死供應商         |
-| **P3** | 誰的結果最好？ | 每週   | **驅動 L2 路由排名** |
-| **P4** | 長期穩定嗎？  | 每月   | 決定 fallback 順序 |
+| Exam   | What It Tests         | Frequency | Drives                        |
+| ------ | --------------------- | --------- | ----------------------------- |
+| **P1** | Is the endpoint alive? | Every 6h  | Remove dead providers          |
+| **P3** | Who returns the best results? | Weekly    | **Drives L2 routing rankings** |
+| **P4** | Long-term stability?  | Monthly   | Determines fallback order      |
 
-**真實發現：** P3 自動發現某供應商日文 query 相關性比英文高 15%。沒人設計這個——考試數據自己浮現。系統自動調整：日文搜尋偏好供應商 A，英文偏好 B。手寫範例永遠找不到這種 pattern。
+**Real discovery:** P3 automatically found that one provider's Japanese query relevance was 15% higher than English. Nobody designed this — the exam data surfaced it on its own. The system auto-adjusted: Japanese searches prefer Provider A, English prefers Provider B. Hand-written examples would never catch this kind of pattern.
 
 ---
 
-### 意圖路由（L3）——Agent 不知道叫誰
+### Intent Routing (L3) — Agents Don't Know Who to Call
 
-Anthropic 假設呼叫者知道要用哪個工具。常常不成立。
+Anthropic assumes the caller knows which tool to use. Often not true.
 
 ```
-「日本人怎麼看新幹線延伸？」
+"What do Japanese people think about the Shinkansen extension?"
+  → actual query: "新幹線延伸 世論" (Japanese)
 
-L3 (<500ms)：搜尋(日文) → 翻譯 → 摘要。三步自動執行。
+L3 (<500ms): search(Japanese) → translate → summarize. Three steps, auto-executed.
 
-沒有 L3：Agent 試錯 → 4-5 次呼叫 → $0.03-0.05，8-15 秒
-有 L3：  一句自然語言  → 3 次精準   → $0.009，3-5 秒
+Without L3: Agent trial-and-error → 4-5 calls → $0.03-0.05, 8-15s
+With L3:    One natural language sentence → 3 precise calls → $0.009, 3-5s
 ```
 
-意圖解析 ~$0.0002/次，ROI 100-200 倍。
+Intent parsing costs ~$0.0002/call. ROI: 100-200x.
 
 ---
 
-### 品質信號（Phase 3）——怎麼知道結果好不好
+### Quality Signal (Phase 3) — How Do You Know the Result Is Good?
 
-Anthropic 優化「到執行前」的路徑。但**呼叫完之後呢？**
+Anthropic optimizes the path up to execution. But **what about after the call returns?**
 
 ```
-Phase 3 評估 → overall: 0.49（結果太舊）→ 自動重跑 → 0.83 ✅
+Phase 3 evaluation → overall: 0.49 (results too stale) → auto-retry → 0.83 ✅
 ```
 
-品質分數是**給機器讀的**。Agent 不用二選一（全信 or 全不信），可以**有條件地信任**——0.83 夠好，用這個寫初稿，但標註弱點部分需要再補。
+Quality scores are **machine-readable**. Agents don't have to choose between trusting everything or trusting nothing — they can **trust conditionally**. 0.83 is good enough: use it to draft, but flag the weak sections for follow-up.
 
 ---
 
-## 哲學差異
+## The Philosophical Difference
 
-|         | Anthropic      | 和心村             |
-| ------- | -------------- | --------------- |
-| **方向**  | 模型更聰明地挑工具      | 工具更容易被挑到        |
-| **控制權** | 模型側（Claude 決定） | API 側（Agent 決定） |
-| **範圍**  | Claude only    | 任何 LLM/Agent    |
-| **定價**  | 藏在 token 裡     | 每步透明（金額+時間）     |
+|              | Anthropic                  | Washin Village              |
+| ------------ | -------------------------- | --------------------------- |
+| **Direction**  | Make the model smarter at picking tools | Make tools easier to be picked |
+| **Control**    | Model-side (Claude decides) | API-side (Agent decides)    |
+| **Scope**      | Claude only                | Any LLM/Agent               |
+| **Pricing**    | Hidden in token costs      | Transparent per step (cost + time) |
 
-**Anthropic 優化「模型怎麼挑工具」，我們優化「工具怎麼讓自己被挑到」。殊途同歸。**
-
----
-
-## 數據
-
-| 指標            | 值                           |
-| ------------- | --------------------------- |
-| 服務            | 39（L1×27 + L2×10 + L3 + L4） |
-| 分類            | 15                          |
-| Defer Loading | 10.8KB → 2.5KB（76%↓）        |
-| PTC vs Auto   | $0.02 vs $0.49（96%↓）        |
-| 考試週期          | P1 每 6h / P3 每週 / P4 每月     |
-| 開發            | 7 個月，工程背景 **零**             |
+**Anthropic optimizes "how the model picks tools." We optimize "how tools make themselves pickable." Different paths, same destination.**
 
 ---
 
-方向正確——獨立想到的架構，跟頂級實驗室一致。應用層有空間——容錯鏈、考試路由、品質信號，模型層做不到。
+## Numbers
 
-**讀了論文。學到東西。當天就做了。**
+| Metric         | Value                                |
+| -------------- | ------------------------------------ |
+| Services       | 39 (L1x27 + L2x10 + L3 + L4)       |
+| Categories     | 15                                   |
+| Defer Loading  | 10.8KB → 2.5KB (76%↓)               |
+| PTC vs Auto    | $0.02 vs $0.49 (96%↓)               |
+| Exam Cycles    | P1 every 6h / P3 weekly / P4 monthly |
+| Development    | 7 months, engineering background **zero** |
+
+---
+
+Direction validated — architecture we arrived at independently matches a top research lab's. Room at the application layer — fallback chains, exam routing, quality signals are things the model layer can't do.
+
+**Read the paper. Learned something. Shipped it the same day.**
 
 ---
 
 **References** — [Anthropic Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use) (2025) · [Zero Engineer](https://github.com/sstklen/zero-engineer) · [112 Claude Code Skills](https://github.com/sstklen/washin-claude-skills) · [crawl-share](https://github.com/sstklen/crawl-share) · [Confucius Debug](https://github.com/sstklen/yanhui-ci)
 
 ```
-ca35575  feat: input_examples — 11 端點附範例
-b31168c  feat: defer_loading — 超輕索引 + 按需載入
-9174e59  feat: dynamic filtering — 5 種篩選參數
-8f4a50d  feat: PTC — L4 支援自帶執行計畫
+ca35575  feat: input_examples — real JSON examples on 11 endpoints
+b31168c  feat: defer_loading — lightweight index + on-demand loading
+9174e59  feat: dynamic filtering — 5 filter parameters
+8f4a50d  feat: PTC — L4 supports agent-supplied execution plans
 ```
 
-**一個下午，4 個 commit。** *Built with 🦞 in Boso Peninsula, Japan.*
+**One afternoon, 4 commits.** *Built with 🦞 in Boso Peninsula, Japan.*

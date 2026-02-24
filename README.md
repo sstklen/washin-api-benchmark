@@ -86,6 +86,8 @@ We read it. Recognized the same patterns we'd been building. Implemented two fea
 - Intent routing (L3) — because agents don't always know which tool to call
 - Post-execution quality signals (L4 Phase 3) — because knowing it ran ≠ knowing it worked
 
+Available in: [English](docs/03-anthropic-advanced-tool-use.md) · [繁體中文](docs/03-anthropic-advanced-tool-use.zh.md) · [日本語](docs/03-anthropic-advanced-tool-use.ja.md)
+
 ---
 
 ## Why This Matters
